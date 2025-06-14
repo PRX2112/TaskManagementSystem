@@ -1,36 +1,47 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Create Team') }}
-        </h2>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>{{ __('Create New Team') }}</h1>
+                <p>{{ __('Build a team to collaborate on projects and achieve your goals together.') }}</p>
+            </div>
+            <a href="{{ route('dashboard') }}" class="btn btn-outline-light">
+                <i class="bi bi-arrow-left me-2"></i>
+                {{ __('Back to Teams') }}
+            </a>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <form method="post" action="{{ route('teams.store') }}" class="mt-6 space-y-6">
-                    @csrf
-                    <div>
-                        <x-input-label for="name" :value="__('Name')" />
-                        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" value="" required autofocus autocomplete="name" />
-                        <x-input-error class="mt-2" :messages="$errors->get('name')" />
-                    </div>  
-
-                    <div class="flex items-center gap-4">
-                        <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-                        @if (session('status') === 'profile-updated')
-                            <p
-                                x-data="{ show: true }"
-                                x-show="show"
-                                x-transition
-                                x-init="setTimeout(() => show = false, 2000)"
-                                class="text-sm text-gray-600"
-                            >{{ __('Saved.') }}</p>
-                        @endif
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-transparent border-0 pt-4">
+                        <h5 class="card-title mb-0">{{ __('Team Information') }}</h5>
                     </div>
-                </form>
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('teams.store') }}">
+                            @csrf
+
+                            <!-- Team Name -->
+                            <div class="mb-4">
+                                <label for="name" class="form-label">{{ __('Team Name') }}</label>
+                                <input id="name" class="form-control" type="text" name="name" value="{{ old('name') }}" required autofocus placeholder="{{ __('Enter team name') }}">
+                                <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="d-flex justify-content-end gap-3">
+                                <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">
+                                    {{ __('Cancel') }}
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-people me-2"></i>
+                                    {{ __('Create Team') }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

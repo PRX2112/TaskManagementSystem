@@ -8,7 +8,7 @@ use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('dashboard');
 });
 
 // Route::get('/dashboard', function () {
@@ -16,6 +16,7 @@ Route::get('/', function () {
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::redirect('/','/dashboard')->name('home');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -29,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/teams/{team}', [TeamController::class, 'show'])->name('teams.show');
     Route::get('/team', [TeamController::class, 'create'])->name('teams.create');
     Route::post('/team', [TeamController::class, 'store'])->name('teams.store');
+    Route::post('/teams/assign', [TeamController::class, 'assign'])->name('teams.assign');
 
     Route::get('/tasks',[TaskController::class, 'create'])->name('tasks.create');
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');

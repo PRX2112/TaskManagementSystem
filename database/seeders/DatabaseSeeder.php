@@ -2,12 +2,14 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Team;
 use App\Models\Project;
 use App\Models\Task;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,31 +18,57 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $users = User::factory(10)->create();
+        // Clear cached roles and permissions
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $teams = Team::factory(3)->create();
+        // Create permissions
+        $permissions = [
+            'assign tasks',
+            'manage projects',
+            'view dashboard',
+        ];
 
-        foreach ($teams as $team) {
-            $team->users()->attach($users->random(rand(3, 6))->pluck('id'));
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
-        foreach ($teams as $team){
+        // Create roles and assign permissions
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $userRole = Role::firstOrCreate(['name' => 'user']);
+
+        $adminRole->syncPermissions($permissions);
+        $userRole->syncPermissions(['view dashboard']);
+
+        // Create admin user
+        $admin = User::factory()->create([
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        $admin->assignRole($adminRole);
+
+        // Create regular users and assign roles
+        $users = User::factory(10)->create();
+        $users->each(fn($user) => $user->assignRole($userRole));
+
+        // Create teams and associate users
+        $teams = Team::factory(3)->create();
+        foreach ($teams as $team) {
+            $teamUsers = $users->random(rand(3, 6));
+            $team->users()->attach($teamUsers->pluck('id'));
+
+            // Create projects for each team
             $projects = Project::factory(rand(2, 3))->create([
                 'team_id' => $team->id,
             ]);
 
-            foreach($projects as $project){
-                $members = $team->users;
-            
+            foreach ($projects as $project) {
+                // Assign 5 tasks to random team members
                 Task::factory(5)->create([
                     'project_id' => $project->id,
-                    'user_id' => $members->random()->id, // Assign a random user from the team
+                    'user_id' => $teamUsers->random()->id,
                 ]);
             }
         }
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
     }
 }
