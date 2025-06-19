@@ -97,20 +97,7 @@ To enable real-time email notifications and daily task summary emails:
   ```
   * * * * * php /path-to-your-project/artisan schedule:run >> /dev/null 2>&1
   ```
-
----
-
-
-
-
-## Features & Scope
-
-- **User Authentication:** Login, registration, profile updates
-- **Team Management:** Create and manage teams
-- **Project Management:** Create projects under teams
-- **Task Management:** Assign tasks to users within projects
-- **Email Notifications:**
-  - When a task is assigned
-  - Daily task summary to users
-- **Roles & Permissions:** (via Laravel Permission package)
-- **UI Components:** Built with Blade with bootstrap and Laravel Breeze
+## Telescope
+  ```bash
+  http://localhost:8000/telescope
+  ```
